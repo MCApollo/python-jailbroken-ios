@@ -1,0 +1,414 @@
+diff -Naur ./Python-3.7.1/configure ../Python-3.7.1/configure
+--- ./Python-3.7.1/configure	2018-10-20 06:04:19.000000000 +0000
++++ ../Python-3.7.1/configure	2018-11-20 03:44:43.410971124 +0000
+@@ -781,6 +781,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -892,6 +893,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1144,6 +1146,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1281,7 +1292,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1434,6 +1445,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -3253,6 +3265,9 @@
+ 	*-*-cygwin*)
+ 		ac_sys_system=Cygwin
+ 		;;
++	*-*-darwin*)
++		ac_sys_system=Darwin
++		;;
+ 	*)
+ 		# for now, limit cross builds to known configurations
+ 		MACHDEP="unknown"
+@@ -3260,7 +3275,7 @@
+ 	esac
+ 	ac_sys_release=
+     else
+-	ac_sys_system=`uname -s`
++	ac_sys_system="Darwin"
+ 	if test "$ac_sys_system" = "AIX" \
+ 	-o "$ac_sys_system" = "UnixWare" -o "$ac_sys_system" = "OpenUNIX"; then
+ 		ac_sys_release=`uname -v`
+@@ -3297,6 +3312,9 @@
+ 	*-*-cygwin*)
+ 		_host_cpu=
+ 		;;
++	*-*-darwin*)
++		_host_cpu=aarch64
++		;;
+ 	*)
+ 		# for now, limit cross builds to known configurations
+ 		MACHDEP="unknown"
+@@ -6177,8 +6195,10 @@
+ 
+ if test "$cross_compiling" = yes; then
+     case "$READELF" in
++	*-*-darwin*)
++	;;
+ 	readelf|:)
+-	as_fn_error $? "readelf for the host is required for cross builds" "$LINENO" 5
++	#AC_MSG_ERROR([readelf for the host is required for cross builds])
+ 	;;
+     esac
+ fi
+@@ -9137,7 +9157,7 @@
+     		MACOSX_DEFAULT_ARCH="ppc"
+     		;;
+     	*)
+-    		as_fn_error $? "Unexpected output of 'arch' on OSX" "$LINENO" 5
++#    		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
+     		;;
+     	esac
+     else
+@@ -9149,13 +9169,13 @@
+     		MACOSX_DEFAULT_ARCH="ppc64"
+     		;;
+     	*)
+-    		as_fn_error $? "Unexpected output of 'arch' on OSX" "$LINENO" 5
++#    		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
+     		;;
+     	esac
+ 
+     fi
+ 
+-    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs -arch_only ${MACOSX_DEFAULT_ARCH}"
++    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs"
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+ esac
+@@ -12931,19 +12951,19 @@
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_buggy_getaddrinfo" >&5
+ $as_echo "$ac_cv_buggy_getaddrinfo" >&6; }
+ 
+-if test $have_getaddrinfo = no || test "$ac_cv_buggy_getaddrinfo" = yes
+-then
+-	if test $ipv6 = yes
+-	then
+-		echo 'Fatal: You must get working getaddrinfo() function.'
+-		echo '       or you can specify "--disable-ipv6"'.
+-		exit 1
+-	fi
+-else
++#if test $have_getaddrinfo = no || test "$ac_cv_buggy_getaddrinfo" = yes
++#then
++#	if test $ipv6 = yes
++#	then
++#		echo 'Fatal: You must get working getaddrinfo() function.'
++#		echo '       or you can specify "--disable-ipv6"'.
++#		exit 0
++#	fi
++#else
+ 
+ $as_echo "#define HAVE_GETADDRINFO 1" >>confdefs.h
+ 
+-fi
++#fi
+ 
+ for ac_func in getnameinfo
+ do :
+diff -Naur ./Python-3.7.1/configure.ac ../Python-3.7.1/configure.ac
+--- ./Python-3.7.1/configure.ac	2018-10-20 06:04:19.000000000 +0000
++++ ../Python-3.7.1/configure.ac	2018-11-20 03:44:39.114966277 +0000
+@@ -379,6 +379,9 @@
+ 	*-*-cygwin*)
+ 		ac_sys_system=Cygwin
+ 		;;
++	*-*-darwin*)
++		ac_sys_system=Darwin
++		;;
+ 	*)
+ 		# for now, limit cross builds to known configurations
+ 		MACHDEP="unknown"
+@@ -386,7 +389,7 @@
+ 	esac
+ 	ac_sys_release=
+     else
+-	ac_sys_system=`uname -s`
++	ac_sys_system="Darwin"
+ 	if test "$ac_sys_system" = "AIX" \
+ 	-o "$ac_sys_system" = "UnixWare" -o "$ac_sys_system" = "OpenUNIX"; then
+ 		ac_sys_release=`uname -v`
+@@ -423,6 +426,9 @@
+ 	*-*-cygwin*)
+ 		_host_cpu=
+ 		;;
++	*-*-darwin*)
++		_host_cpu=aarch64
++		;;
+ 	*)
+ 		# for now, limit cross builds to known configurations
+ 		MACHDEP="unknown"
+@@ -1203,8 +1209,10 @@
+ AC_CHECK_TOOLS([READELF], [readelf], [:])
+ if test "$cross_compiling" = yes; then
+     case "$READELF" in
++	*-*-darwin*)
++	;;
+ 	readelf|:)
+-	AC_MSG_ERROR([readelf for the host is required for cross builds])
++	#AC_MSG_ERROR([readelf for the host is required for cross builds])
+ 	;;
+     esac
+ fi
+@@ -2415,7 +2423,7 @@
+     		MACOSX_DEFAULT_ARCH="ppc"
+     		;;
+     	*)
+-    		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
++#    		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
+     		;;
+     	esac
+     else
+@@ -2427,13 +2435,13 @@
+     		MACOSX_DEFAULT_ARCH="ppc64"
+     		;;
+     	*)
+-    		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
++#    		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
+     		;;
+     	esac
+ 
+     fi
+ 
+-    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs -arch_only ${MACOSX_DEFAULT_ARCH}"
++    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs"
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+ esac
+@@ -3977,17 +3985,17 @@
+ 
+ AC_MSG_RESULT($ac_cv_buggy_getaddrinfo)
+ 
+-if test $have_getaddrinfo = no || test "$ac_cv_buggy_getaddrinfo" = yes
+-then
+-	if test $ipv6 = yes
+-	then
+-		echo 'Fatal: You must get working getaddrinfo() function.'
+-		echo '       or you can specify "--disable-ipv6"'.
+-		exit 1
+-	fi
+-else
++#if test $have_getaddrinfo = no || test "$ac_cv_buggy_getaddrinfo" = yes
++#then
++#	if test $ipv6 = yes
++#	then
++#		echo 'Fatal: You must get working getaddrinfo() function.'
++#		echo '       or you can specify "--disable-ipv6"'.
++#		exit 0
++#	fi
++#else
+ 	AC_DEFINE(HAVE_GETADDRINFO, 1, [Define if you have the getaddrinfo function.])
+-fi
++#fi
+ 
+ AC_CHECK_FUNCS(getnameinfo)
+ 
+diff -Naur ./Python-3.7.1/Modules/_dbmmodule.c ../Python-3.7.1/Modules/_dbmmodule.c
+--- ./Python-3.7.1/Modules/_dbmmodule.c	2018-10-20 06:04:19.000000000 +0000
++++ ../Python-3.7.1/Modules/_dbmmodule.c	2018-11-20 04:28:47.465986092 +0000
+@@ -12,6 +12,7 @@
+ /* Some Linux systems install gdbm/ndbm.h, but not ndbm.h.  This supports
+  * whichever configure was able to locate.
+  */
++#define HAVE_NDBM_H 1
+ #if defined(HAVE_NDBM_H)
+ #include <ndbm.h>
+ static const char which_dbm[] = "GNU gdbm";  /* EMX port of GDBM */
+diff -Naur ./Python-3.7.1/Modules/posixmodule.c ../Python-3.7.1/Modules/posixmodule.c
+--- ./Python-3.7.1/Modules/posixmodule.c	2018-10-20 06:04:19.000000000 +0000
++++ ../Python-3.7.1/Modules/posixmodule.c	2018-11-24 05:50:30.783023401 +0000
+@@ -52,6 +52,8 @@
+ corresponding Unix manual entries for more information on calls.");
+ 
+ 
++#undef _POSIX_C_SOURCE
++
+ #ifdef HAVE_SYS_UIO_H
+ #include <sys/uio.h>
+ #endif
+@@ -8304,7 +8306,7 @@
+     return _Py_write(fd, data->buf, data->len);
+ }
+ 
+-#ifdef HAVE_SENDFILE
++#if 0 //def HAVE_SENDFILE
+ PyDoc_STRVAR(posix_sendfile__doc__,
+ "sendfile(out, in, offset, count) -> byteswritten\n\
+ sendfile(out, in, offset, count[, headers][, trailers], flags=0)\n\
+@@ -8323,7 +8325,7 @@
+ #if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__)
+ #ifndef __APPLE__
+     Py_ssize_t len;
+-#endif
++#endif /* APPLE */
+     PyObject *headers = NULL, *trailers = NULL;
+     Py_buffer *hbuf, *tbuf;
+     off_t sbytes;
+@@ -8343,7 +8345,7 @@
+ #else
+     if (!PyArg_ParseTupleAndKeywords(args, kwdict, "iiO&n|OOi:sendfile",
+         keywords, &out, &in, Py_off_t_converter, &offset, &len,
+-#endif
++#endif /* APPLE */
+                 &headers, &trailers, &flags))
+             return NULL;
+     if (headers != NULL) {
+@@ -8376,7 +8378,7 @@
+                     }
+                     sbytes += blen;
+                 }
+-#endif
++#endif /* APPLE */
+             }
+         }
+     }
+@@ -8407,10 +8409,11 @@
+     do {
+         Py_BEGIN_ALLOW_THREADS
+ #ifdef __APPLE__
+-        ret = sendfile(in, out, offset, &sbytes, &sf, flags);
++        //
++        ret = sendfile(in, out, offset, &sbytes, &sf, flags); // Crash here?
+ #else
+         ret = sendfile(in, out, offset, len, &sf, &sbytes, flags);
+-#endif
++#endif /* APPLE */
+         Py_END_ALLOW_THREADS
+     } while (ret < 0 && errno == EINTR && !(async_err = PyErr_CheckSignals()));
+     _Py_END_SUPPRESS_IPH
+@@ -8443,7 +8446,7 @@
+         return Py_BuildValue("L", sbytes);
+     #endif
+ 
+-#else
++#else // defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__)
+     Py_ssize_t count;
+     PyObject *offobj;
+     static char *keywords[] = {"out", "in",
+diff -Naur ./Python-3.7.1/setup.py ../Python-3.7.1/setup.py
+--- ./Python-3.7.1/setup.py	2018-10-20 06:04:19.000000000 +0000
++++ ../Python-3.7.1/setup.py	2018-11-20 05:47:01.239291575 +0000
+@@ -620,6 +620,9 @@
+ 
+         srcdir = sysconfig.get_config_var('srcdir')
+ 
++        inc_dirs += ['/home/XXX/toolchain/SDK/usr/include']
++        lib_dirs += ['/home/XXX/toolchain/SDK/usr/lib']
++
+         # OSF/1 and Unixware have some stuff in /usr/ccs/lib (like -ldb)
+         if host_platform in ['osf1', 'unixware7', 'openunix8']:
+             lib_dirs += ['/usr/ccs/lib']
+@@ -855,7 +858,8 @@
+                                    extra_link_args=readline_extra_link_args,
+                                    libraries=readline_libs) )
+         else:
+-            missing.append('readline')
++            exts.append( Extension('readline', ['readline.c']) )
++#            missing.append('readline')
+ 
+         # crypt module.
+ 
+@@ -1311,7 +1315,8 @@
+             if dbmext is not None:
+                 exts.append(dbmext)
+             else:
+-                missing.append('_dbm')
++                exts.append( Extension('_dbm', ['_dbmmodule.c']))
++#                missing.append('_dbm')
+ 
+         # Anthony Baxter's gdbm module.  GNU dbm(3) will require -lgdbm:
+         if ('gdbm' in dbm_order and
+@@ -1319,7 +1324,8 @@
+             exts.append( Extension('_gdbm', ['_gdbmmodule.c'],
+                                    libraries = ['gdbm'] ) )
+         else:
+-            missing.append('_gdbm')
++            exts.append( Extension('_gdbm', ['_gdbmmodule.c']))
++#            missing.append('_gdbm')
+ 
+         # Unix-only modules
+         if host_platform != 'win32':
+@@ -1381,7 +1387,8 @@
+                                    define_macros=curses_defines,
+                                    libraries = curses_libs) )
+         else:
+-            missing.append('_curses')
++            exts.append( Extension('_curses', ['_cursesmodule.c']))
++#            missing.append('_curses')
+ 
+         # If the curses module is enabled, check for the panel module
+         if (module_enabled(exts, '_curses') and
+@@ -1391,7 +1398,8 @@
+                                    define_macros=curses_defines,
+                                    libraries = [panel_library] + curses_libs) )
+         else:
+-            missing.append('_curses_panel')
++            exts.append( Extension('_curses_panel', ['_curses_panel.c']))
++#            missing.append('_curses_panel')
+ 
+         # Andrew Kuchling's zlib module.  Note that some versions of zlib
+         # 1.1.3 have security problems.  See CERT Advisory CA-2002-07:
+@@ -1635,7 +1643,8 @@
+                                    libraries=uuid_libs,
+                                    include_dirs=uuid_incs))
+         else:
+-            missing.append('_uuid')
++            self.extensions.append(Extension('_uuid', ['_uuidmodule.c']))
++#            missing.append('_uuid')
+ 
+ ##         # Uncomment these lines if you want to play with xxmodule.c
+ ##         ext = Extension('xx', ['xxmodule.c'])
+@@ -1996,9 +2005,10 @@
+                     ffi_lib = lib_name
+                     break
+ 
+-        if ffi_inc and ffi_lib:
+-            ext.include_dirs.extend(ffi_inc)
+-            ext.libraries.append(ffi_lib)
++#        if ffi_inc and ffi_lib:
++        if True:
++#            ext.include_dirs.extend(ffi_inc)
++            ext.libraries.append('ffi')
+             self.use_system_libffi = True
+ 
+         if sysconfig.get_config_var('HAVE_LIBDL'):

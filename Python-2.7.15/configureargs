@@ -1,0 +1,6 @@
+'--host=aarch64-apple-darwin' 
+'--enable-shared' 
+'--disable-static' '--with-system-ffi' '--with-signal-module' 
+'--disable-toolbox-glue' '--enable-ipv6' '--enable-unicode' 
+'--enable-big-digits' '--with-system-expat' '--enable-unicode=ucs4' 
+'--with-dbmliborder=gdbm' '--without-ensurepip' 
