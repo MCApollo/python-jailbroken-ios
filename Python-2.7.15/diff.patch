@@ -5726,25 +5726,6 @@ diff -Naur Python-2.7.15/Modules/dbmmodule.c ../Python-2.7.15/Modules/dbmmodule.
  #if defined(HAVE_NDBM_H)
  #include <ndbm.h>
  #if defined(PYOS_OS2) && !defined(PYCC_GCC)
-diff -Naur Python-2.7.15/Modules/getbuildinfo.c ../Python-2.7.15/Modules/getbuildinfo.c
---- Python-2.7.15/Modules/getbuildinfo.c	2018-04-29 22:47:33.000000000 +0000
-+++ ../Python-2.7.15/Modules/getbuildinfo.c	2018-11-20 02:49:34.403202185 +0000
-@@ -7,6 +7,7 @@
- #ifndef DATE
- #ifdef __DATE__
- #define DATE __DATE__
-+//#define DATE "11/1/18"
- #else
- #define DATE "xx/xx/xx"
- #endif
-@@ -15,6 +16,7 @@
- #ifndef TIME
- #ifdef __TIME__
- #define TIME __TIME__
-+//#define TIME "12:12:12"
- #else
- #define TIME "xx:xx:xx"
- #endif
 diff -Naur Python-2.7.15/rpcsvc/ypclnt.h ../Python-2.7.15/rpcsvc/ypclnt.h
 --- Python-2.7.15/rpcsvc/ypclnt.h	1970-01-01 00:00:00.000000000 +0000
 +++ ../Python-2.7.15/rpcsvc/ypclnt.h	2018-11-19 21:04:15.291572197 +0000
